@@ -13,12 +13,6 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('*', (req, res, next) => {
-  res.status(ERROR_404).send({ message: MESSAGE_404 });
-
-  next();
-});
-
 app.use((req, res, next) => {
   req.user = {
     _id: "63905976c446265e3ec7bff5", // вставьте сюда _id созданного в предыдущем пункте пользователя
@@ -31,6 +25,12 @@ mongoose.connect("mongodb://localhost:27017/mestodb");
 
 app.use(userRouter);
 app.use(cardRouter);
+
+app.use('*', (req, res, next) => {
+  res.status(ERROR_404).send({ message: MESSAGE_404 });
+
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
