@@ -1,4 +1,12 @@
 const Card = require("../models/card");
+const {
+  ERROR_400,
+  ERROR_404,
+  ERROR_500,
+  MESSAGE_404,
+  MESSAGE_400,
+  MESSAGE_500,
+} = require("../errors/errors");
 
 // запрос на получение всех карточек
 module.exports.getCards = async (req, res) => {
@@ -7,7 +15,7 @@ module.exports.getCards = async (req, res) => {
     return res.status(200).json(cards);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -26,12 +34,11 @@ module.exports.createCard = async (req, res) => {
     });
     return res.status(201).json(card);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при создании карточки" });
+    if ((err.name === "CastError") || (err.name === "TypeError") || (err.name === "ValidationError")) {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).json({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -47,12 +54,11 @@ module.exports.deleteCard = async (req, res) => {
     }
     return res.status(200).send(card);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные для снятия лайка" });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).json({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -65,18 +71,18 @@ module.exports.likeCard = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!card) {
-      return res.status(404).send({
-        message: "Такой карточки не существует",
+      return res.status(ERROR_404).send({
+        message: MESSAGE_404,
       });
     }
-    card.populate(['likes']);
-    return res.status(200).json({ message: 'Лайк успешно добавлен' });
+    card.populate(["likes"]);
+    return res.status(200).json({ message: "Лайк успешно добавлен" });
   } catch (err) {
-    if (((err.name === 'CastError'))) {
-      return res.status(400).json({ message: "Переданы некорректные данные для постановки лайка" });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).json({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -89,18 +95,17 @@ module.exports.dislikeCard = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!card) {
-      return res.status(404).send({
-        message: "Такой карточки не существует",
+      return res.status(ERROR_404).send({
+        message: MESSAGE_404,
       });
     }
-    card.populate(['likes']);
-    return res.status(200).json({ message: 'Лайк успешно снят' });
+    card.populate(["likes"]);
+    return res.status(200).json({ message: "Лайк успешно снят" });
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные для снятия лайка" });
+    if (err.name === "CastError") {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).json({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };

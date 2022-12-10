@@ -1,4 +1,12 @@
 const User = require("../models/user");
+const {
+  ERROR_400,
+  ERROR_404,
+  ERROR_500,
+  MESSAGE_404,
+  MESSAGE_400,
+  MESSAGE_500,
+} = require("../errors/errors");
 
 // запрос на всех пользователей
 module.exports.getUsers = async (req, res) => {
@@ -7,7 +15,7 @@ module.exports.getUsers = async (req, res) => {
     return res.status(200).json(users);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -18,17 +26,16 @@ module.exports.getUser = async (req, res) => {
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res
-        .status(404)
-        .json({ message: "Запрашиваемый пользователь не найден" });
+        .status(ERROR_404)
+        .json({ message: MESSAGE_404 });
     }
     return res.status(200).json(user);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные" });
+    if ((err.name === 'CastError') || (err.name === 'TypeError')) {
+      return res.status(ERROR_400).json({ message: ERROR_400 });
     }
     console.log(err);
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -39,12 +46,11 @@ module.exports.createUser = async (req, res) => {
     const newUser = await User.create({ name, about, avatar });
     return res.status(201).json(newUser);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при создании пользователя" });
+    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -60,18 +66,17 @@ module.exports.updateProfile = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!updatedUser) {
-      return res.status(404).send({
-        message: "Запрашиваемый пользователь не найден",
+      return res.status(ERROR_404).send({
+        message: MESSAGE_404,
       });
     }
     return res.status(200).json(updatedUser);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при обновлении профиля" });
+    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
@@ -86,17 +91,16 @@ module.exports.updateAvatar = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!updatedUserAvatar) {
-      return res.status(404).send({
-        message: "Запрашиваемый пользователь не найден",
+      return res.status(ERROR_404).send({
+        message: MESSAGE_404,
       });
     }
     return res.status(200).json(updatedUserAvatar);
   } catch (err) {
-    const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
-      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при обновлении аватара" });
+    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
