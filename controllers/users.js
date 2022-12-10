@@ -57,7 +57,7 @@ module.exports.updateProfile = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!updatedUser) {
       return res.status(404).send({
@@ -82,7 +82,7 @@ module.exports.updateAvatar = async (req, res) => {
     const updatedUserAvatar = await User.findByIdAndUpdate(
       req.user._id,
       { avatar: req.user.avatar },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!updatedUserAvatar) {
       return res.status(404).send({

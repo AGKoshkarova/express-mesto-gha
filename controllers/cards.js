@@ -62,7 +62,7 @@ module.exports.likeCard = async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!card) {
       return res.status(404).send({
@@ -86,14 +86,14 @@ module.exports.dislikeCard = async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } }, // убрать _id из массива
-      { new: true }
+      { new: true, runValidators: true }
     );
-    card.populate(['likes']);
     if (!card) {
       return res.status(404).send({
         message: "Такой карточки не существует",
       });
     }
+    card.populate(['likes']);
     return res.status(200).json({ message: 'Лайк успешно снят' });
   } catch (err) {
     const ERROR_CODE = 400;
