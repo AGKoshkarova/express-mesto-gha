@@ -32,7 +32,7 @@ module.exports.getUser = async (req, res) => {
     return res.status(200).json(user);
   } catch (err) {
     if ((err.name === 'CastError') || (err.name === 'TypeError')) {
-      return res.status(ERROR_400).json({ message: ERROR_400 });
+      return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
     return res.status(ERROR_500).json({ message: MESSAGE_500 });
