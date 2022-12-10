@@ -35,6 +35,10 @@ module.exports.createUser = async (req, res) => {
     const newUser = await User.create({ name, about, avatar });
     return res.status(201).json(newUser);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError') || (err.name === 'TypeError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при создании пользователя" });
+    }
     console.log(err);
     return res.status(500).send({ message: `Произошла ошибка ${err}` });
   }
