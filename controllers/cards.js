@@ -26,6 +26,10 @@ module.exports.createCard = async (req, res) => {
     });
     return res.status(201).json(card);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при создании карточки" });
+    }
     console.log(err);
     return res.status(500).json({ message: `Произошла ошибка ${err}` });
   }
@@ -43,6 +47,10 @@ module.exports.deleteCard = async (req, res) => {
     }
     return res.status(200).send(card);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные для снятия лайка" });
+    }
     console.log(err);
     return res.status(500).json({ message: `Произошла ошибка ${err}` });
   }
@@ -56,14 +64,17 @@ module.exports.likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true }
     );
-    card.populate(['likes']);
     if (!card) {
       return res.status(404).send({
         message: "Такой карточки не существует",
       });
     }
+    card.populate(['likes']);
     return res.status(200).json({ message: 'Лайк успешно добавлен' });
   } catch (err) {
+    if (((err.name === 'CastError'))) {
+      return res.status(400).json({ message: "Переданы некорректные данные для постановки лайка" });
+    }
     console.log(err);
     return res.status(500).json({ message: `Произошла ошибка ${err}` });
   }
@@ -85,6 +96,10 @@ module.exports.dislikeCard = async (req, res) => {
     }
     return res.status(200).json({ message: 'Лайк успешно снят' });
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные для снятия лайка" });
+    }
     console.log(err);
     return res.status(500).json({ message: `Произошла ошибка ${err}` });
   }

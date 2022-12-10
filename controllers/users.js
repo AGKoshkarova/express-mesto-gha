@@ -23,6 +23,10 @@ module.exports.getUser = async (req, res) => {
     }
     return res.status(200).json(user);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError') || (err.name === 'TypeError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные" });
+    }
     console.log(err);
     return res.status(500).send({ message: `Произошла ошибка ${err}` });
   }
@@ -36,7 +40,7 @@ module.exports.createUser = async (req, res) => {
     return res.status(201).json(newUser);
   } catch (err) {
     const ERROR_CODE = 400;
-    if (((err.name === 'CastError') || (err.name === 'TypeError'))) {
+    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
       return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при создании пользователя" });
     }
     console.log(err);
@@ -62,6 +66,10 @@ module.exports.updateProfile = async (req, res) => {
     }
     return res.status(200).json(updatedUser);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при обновлении профиля" });
+    }
     console.log(err);
     return res.status(500).send({ message: `Произошла ошибка ${err}` });
   }
@@ -83,6 +91,10 @@ module.exports.updateAvatar = async (req, res) => {
     }
     return res.status(200).json(updatedUserAvatar);
   } catch (err) {
+    const ERROR_CODE = 400;
+    if (((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError'))) {
+      return res.status(ERROR_CODE).json({ message: "Переданы некорректные данные при обновлении аватара" });
+    }
     console.log(err);
     return res.status(500).send({ message: `Произошла ошибка ${err}` });
   }

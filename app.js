@@ -20,6 +20,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('*', (res, req, next) => {
+  next(new Error('Такого пути не существует'));
+});
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(userRouter);
