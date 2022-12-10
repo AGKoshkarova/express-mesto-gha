@@ -20,6 +20,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('*', (req, res, next) => {
+  const error = new Error("Такой страницы не существует");
+  error.status = 404;
+  next(error);
+});
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(userRouter);

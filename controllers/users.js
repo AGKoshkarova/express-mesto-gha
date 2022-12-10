@@ -79,9 +79,10 @@ module.exports.updateProfile = async (req, res) => {
 module.exports.updateAvatar = async (req, res) => {
   console.log(req.user._id);
   try {
+    const { avatar } = req.body;
     const updatedUserAvatar = await User.findByIdAndUpdate(
       req.user._id,
-      { avatar: req.user.avatar },
+      avatar,
       { new: true, runValidators: true }
     );
     if (!updatedUserAvatar) {
