@@ -2,7 +2,7 @@ const ERROR_400 = 400;
 const ERROR_404 = 404;
 const ERROR_500 = 500;
 
-const MESSAGE_404 = "Пользователь или карточка найдены";
+const MESSAGE_404 = "Пользователь или карточка не найдены";
 const MESSAGE_400 = "Переданы некорректные данные";
 const MESSAGE_500 = "Произошла ошибка";
 
