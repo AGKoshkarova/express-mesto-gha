@@ -14,7 +14,7 @@ const {
 // запрос на получение всех карточек
 module.exports.getCards = async (req, res) => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}).populate(['owner', 'likes']);
     return res.status(STATUS_200).json(cards);
   } catch (err) {
     console.log(err);
@@ -37,7 +37,7 @@ module.exports.createCard = async (req, res) => {
     });
     return res.status(STATUS_201).json(card);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);

@@ -48,7 +48,7 @@ module.exports.createUser = async (req, res) => {
     const newUser = await User.create({ name, about, avatar });
     return res.status(STATUS_201).json(newUser);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
@@ -74,7 +74,7 @@ module.exports.updateProfile = async (req, res) => {
     }
     return res.status(STATUS_200).json(updatedUser);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
@@ -99,7 +99,7 @@ module.exports.updateAvatar = async (req, res) => {
     }
     return res.status(STATUS_200).json(updatedUserAvatar);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
