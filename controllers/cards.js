@@ -37,7 +37,7 @@ module.exports.createCard = async (req, res) => {
     });
     return res.status(STATUS_201).json(card);
   } catch (err) {
-    if ((err.name === 'CastError')) {
+    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);

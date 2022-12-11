@@ -48,7 +48,7 @@ module.exports.createUser = async (req, res) => {
     const newUser = await User.create({ name, about, avatar });
     return res.status(STATUS_201).json(newUser);
   } catch (err) {
-    if ((err.name === 'CastError')) {
+    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
