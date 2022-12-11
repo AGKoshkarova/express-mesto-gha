@@ -8,7 +8,6 @@ const {
   MESSAGE_404,
   MESSAGE_400,
   MESSAGE_500,
-  MESSAGE_200,
 } = require('../utils/constants');
 
 // запрос на получение всех карточек
@@ -79,7 +78,7 @@ module.exports.likeCard = async (req, res) => {
       });
     }
     card.populate(['likes']);
-    return res.status(STATUS_200).json({ message: MESSAGE_200 });
+    return res.status(STATUS_200).json(card);
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
@@ -103,7 +102,7 @@ module.exports.dislikeCard = async (req, res) => {
       });
     }
     card.populate(['likes']);
-    return res.status(STATUS_200).json({ message: MESSAGE_200 });
+    return res.status(STATUS_200).json(card);
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
