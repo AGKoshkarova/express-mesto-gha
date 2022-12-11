@@ -1,18 +1,20 @@
-const User = require("../models/user");
+const User = require('../models/user');
 const {
   ERROR_400,
   ERROR_404,
   ERROR_500,
+  STATUS_200,
+  STATUS_201,
   MESSAGE_404,
   MESSAGE_400,
   MESSAGE_500,
-} = require("../errors/errors");
+} = require('../utils/constants');
 
 // запрос на всех пользователей
 module.exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    return res.status(200).json(users);
+    return res.status(STATUS_200).json(users);
   } catch (err) {
     console.log(err);
     return res.status(ERROR_500).json({ message: MESSAGE_500 });
@@ -29,9 +31,9 @@ module.exports.getUser = async (req, res) => {
         .status(ERROR_404)
         .json({ message: MESSAGE_404 });
     }
-    return res.status(200).json(user);
+    return res.status(STATUS_200).json(user);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'TypeError')) {
+    if ((err.name === 'CastError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
@@ -44,9 +46,9 @@ module.exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
     const newUser = await User.create({ name, about, avatar });
-    return res.status(201).json(newUser);
+    return res.status(STATUS_201).json(newUser);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'CastError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
@@ -63,16 +65,16 @@ module.exports.updateProfile = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedUser) {
       return res.status(ERROR_404).send({
         message: MESSAGE_404,
       });
     }
-    return res.status(200).json(updatedUser);
+    return res.status(STATUS_200).json(updatedUser);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
@@ -88,16 +90,16 @@ module.exports.updateAvatar = async (req, res) => {
     const updatedUserAvatar = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedUserAvatar) {
       return res.status(ERROR_404).send({
         message: MESSAGE_404,
       });
     }
-    return res.status(200).json(updatedUserAvatar);
+    return res.status(STATUS_200).json(updatedUserAvatar);
   } catch (err) {
-    if ((err.name === 'CastError') || (err.name === 'TypeError') || (err.name === 'ValidationError')) {
+    if ((err.name === 'CastError') || (err.name === 'ValidationError')) {
       return res.status(ERROR_400).json({ message: MESSAGE_400 });
     }
     console.log(err);
