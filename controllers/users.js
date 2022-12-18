@@ -64,7 +64,12 @@ module.exports.createUser = async (req, res, next) => {
       email,
       password: hash,
     });
-    return res.status(STATUS_201).json(newUser);
+    return res.status(STATUS_201).json({
+      name: newUser.name,
+      about: newUser.about,
+      avatar: newUser.avatar,
+      email: newUser.email,
+    });
   } catch (err) {
     if (err.name === 'ValidationError') {
       // return res.status(ERROR_400).json({ message: MESSAGE_400 });
@@ -142,7 +147,7 @@ module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findUserByCredentials(email, password);
-    if (!user) {
+    if (!email || !password) {
       return next(new AuthorizationError(MESSAGE_401));
     }
     const secretKey = 'my_secret_token_key';
@@ -152,7 +157,7 @@ module.exports.login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.send({ token });
+    return res.send({ data: user.toJSON() });
   } catch (err) {
     return next(err);
     // return res.status(ERROR_401).json({ message: MESSAGE_401 });
