@@ -1,3 +1,5 @@
+const ERROR_401 = 401;
+const ERROR_404 = 404;
 const STATUS_200 = 200;
 const STATUS_201 = 201;
 const url = /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))(:\d{2,5})?((\/.+)+)?\/?#?/;
@@ -11,6 +13,8 @@ const MESSAGE_500 = 'Произошла ошибка';
 const MESSAGE_200 = 'Успешно';
 
 module.exports = {
+  ERROR_401,
+  ERROR_404,
   STATUS_200,
   STATUS_201,
   MESSAGE_400,
