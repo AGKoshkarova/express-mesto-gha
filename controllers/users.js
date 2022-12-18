@@ -9,7 +9,6 @@ const {
   MESSAGE_401,
   MESSAGE_404,
   MESSAGE_409,
-  secretKey,
 } = require('../utils/constants');
 
 const NotFoundError = require('../errors/not-found-err');
@@ -146,10 +145,12 @@ module.exports.login = async (req, res, next) => {
     if (!user) {
       return next(new AuthorizationError(MESSAGE_401));
     }
+    const secretKey = 'my_secret_token_key';
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     res.cookie('jwt', token, {
       maxAge: 3600000,
       httpOnly: true,
+      sameSite: true,
     });
     return res.send({ token });
   } catch (err) {
