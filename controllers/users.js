@@ -147,9 +147,6 @@ module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findUserByCredentials(email, password);
-    if (!user) {
-      return next(new AuthorizationError(MESSAGE_401));
-    }
     const secretKey = 'my_secret_token_key';
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     res.cookie('jwt', token, {

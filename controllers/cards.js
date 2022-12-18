@@ -52,13 +52,13 @@ module.exports.deleteCard = async (req, res, next) => {
   console.log(req.user._id);
   try {
     const card = await Card.findByIdAndRemove(req.params.cardId);
-    const owner = card.owner.toHexString();
-    if (!req.params.cardId) {
+    if (!card) {
       // return res.status(ERROR_404).send({
       //   message: MESSAGE_404,
       // });
       return next(new NotFoundError(MESSAGE_404));
     }
+    const owner = card.owner.toHexString();
     if (owner !== req.user._id) {
       // return res.status(ERROR_401).send({
       //  message: MESSAGE_401,
