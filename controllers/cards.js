@@ -53,7 +53,7 @@ module.exports.deleteCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndRemove(req.params.cardId);
     const owner = card.owner.toHexString();
-    if (!card) {
+    if (!req.params.cardId) {
       // return res.status(ERROR_404).send({
       //   message: MESSAGE_404,
       // });
