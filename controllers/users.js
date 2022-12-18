@@ -1,64 +1,87 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+// const validator = require('validator');
 const User = require('../models/user');
 const {
-  ERROR_400,
-  ERROR_404,
-  ERROR_500,
   STATUS_200,
   STATUS_201,
-  MESSAGE_404,
   MESSAGE_400,
-  MESSAGE_500,
+  MESSAGE_401,
+  MESSAGE_404,
+  MESSAGE_409,
+  secretKey,
 } = require('../utils/constants');
 
+const NotFoundError = require('../errors/not-found-err');
+const AuthorizationError = require('../errors/auth-err');
+const BadRequestError = require('../errors/baq-req-err');
+const EmailError = require('../errors/email-err');
+
 // запрос на всех пользователей
-module.exports.getUsers = async (req, res) => {
+module.exports.getUsers = async (req, res, next) => {
+  console.log(req.cookies.jwt);
   try {
     const users = await User.find({});
     return res.status(STATUS_200).json(users);
   } catch (err) {
-    console.log(err);
-    return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
   }
 };
 
 // запрос на поиск пользователя по его id
-module.exports.getUser = async (req, res) => {
-  console.log(req.params.userId);
+module.exports.getUser = async (req, res, next) => {
+  console.log(req.cookies.jwt);
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      return res
-        .status(ERROR_404)
-        .json({ message: MESSAGE_404 });
+      // return res.status(ERROR_404).json({ message: MESSAGE_404 });
+      return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(user);
   } catch (err) {
-    if ((err.name === 'CastError')) {
-      return res.status(ERROR_400).json({ message: MESSAGE_400 });
+    if (err.name === 'CastError') {
+      return next(new BadRequestError(MESSAGE_400));
     }
-    console.log(err);
-    return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
   }
 };
 
 // запрос на создание пользователя
-module.exports.createUser = async (req, res) => {
+module.exports.createUser = async (req, res, next) => {
   try {
-    const { name, about, avatar } = req.body;
-    const newUser = await User.create({ name, about, avatar });
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
+    const hash = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    });
     return res.status(STATUS_201).json(newUser);
   } catch (err) {
-    if ((err.name === 'ValidationError')) {
-      return res.status(ERROR_400).json({ message: MESSAGE_400 });
+    if (err.name === 'ValidationError') {
+      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
+      return next(new BadRequestError(MESSAGE_400));
     }
-    console.log(err);
-    return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    if (err.code === 11000) {
+      return next(new EmailError(MESSAGE_409));
+    }
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
   }
 };
 
 // запрос на обновление имя и описания пользователя в профиле
-module.exports.updateProfile = async (req, res) => {
-  console.log(req.user._id);
+module.exports.updateProfile = async (req, res, next) => {
+  console.log(req.cookies.jwt);
   try {
     const { name, about } = req.body;
 
@@ -68,23 +91,26 @@ module.exports.updateProfile = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!updatedUser) {
-      return res.status(ERROR_404).send({
-        message: MESSAGE_404,
-      });
+      // return res.status(ERROR_404).send({
+      //   message: MESSAGE_404,
+      // });
+      return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(updatedUser);
   } catch (err) {
-    if ((err.name === 'ValidationError')) {
-      return res.status(ERROR_400).json({ message: MESSAGE_400 });
+    if (err.name === 'ValidationError') {
+      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
+      return next(new BadRequestError(MESSAGE_400));
     }
-    console.log(err);
-    return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
   }
 };
 
 // запрос на изменение аватара пользователя
-module.exports.updateAvatar = async (req, res) => {
-  console.log(req.user._id);
+module.exports.updateAvatar = async (req, res, next) => {
+  console.log(req.cookies.jwt);
   try {
     const { avatar } = req.body;
     const updatedUserAvatar = await User.findByIdAndUpdate(
@@ -93,16 +119,56 @@ module.exports.updateAvatar = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!updatedUserAvatar) {
-      return res.status(ERROR_404).send({
-        message: MESSAGE_404,
-      });
+      // return res.status(ERROR_404).send({
+      //   message: MESSAGE_404,
+      // });
+      return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(updatedUserAvatar);
   } catch (err) {
-    if ((err.name === 'ValidationError')) {
-      return res.status(ERROR_400).json({ message: MESSAGE_400 });
+    if (err.name === 'ValidationError') {
+      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
+      return next(new BadRequestError(MESSAGE_400));
     }
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
+  }
+};
+
+// запрос на логин (контроллер аутентификации)
+module.exports.login = async (req, res, next) => {
+  console.log(req.cookies.jwt);
+  try {
+    const { email, password } = req.body;
+    const user = await User.findUserByCredentials(email, password);
+    if (!user) {
+      return next(new AuthorizationError(MESSAGE_401));
+    }
+    const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
+    res.cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+    });
+    return res.send({ token });
+  } catch (err) {
+    return next(err);
+    // return res.status(ERROR_401).json({ message: MESSAGE_401 });
+    // console.log(err);
+    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
+  }
+};
+
+// запрос на получение информации о текущем пользователе
+module.exports.getUserInformation = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return next(new NotFoundError(MESSAGE_404));
+    }
+    return res.status(STATUS_200).json(user);
+  } catch (err) {
     console.log(err);
-    return res.status(ERROR_500).json({ message: MESSAGE_500 });
+    return next(err);
   }
 };
