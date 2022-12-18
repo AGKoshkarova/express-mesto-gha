@@ -2,14 +2,12 @@ const Card = require('../models/card');
 const {
   STATUS_200,
   STATUS_201,
-  MESSAGE_401,
   MESSAGE_404,
   MESSAGE_400,
   MESSAGE_403,
 } = require('../utils/constants');
 
 const NotFoundError = require('../errors/not-found-err');
-const AuthorizationError = require('../errors/auth-err');
 const BadRequestError = require('../errors/baq-req-err');
 const AccesError = require('../errors/acces-err');
 
@@ -50,22 +48,25 @@ module.exports.createCard = async (req, res, next) => {
 
 // запрос на удаление карточки
 module.exports.deleteCard = async (req, res, next) => {
-  console.log(req.params.cardId);
+  // console.log(req.params.cardId);
+  console.log(req.user._id);
   try {
     const card = await Card.findByIdAndRemove(req.params.cardId);
+    const owner = card.owner.toHexString();
     if (!card) {
       // return res.status(ERROR_404).send({
       //   message: MESSAGE_404,
       // });
       return next(new NotFoundError(MESSAGE_404));
     }
-    if (card.owner !== req.user._id) {
+    if (owner !== req.user._id) {
       // return res.status(ERROR_401).send({
       //  message: MESSAGE_401,
       // });
       return next(new AccesError(MESSAGE_403));
     }
     return res.status(STATUS_200).send(card);
+    // return res.status(STATUS_200).send(card);
   } catch (err) {
     if (err.name === 'CastError') {
       // return res.status(ERROR_400).json({ message: MESSAGE_400 });
