@@ -20,14 +20,6 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((req, res, next) => {
-//  req.user = {
-//    _id: '63905976c446265e3ec7bff5',
-//  };
-
-//  next();
-// });
-
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.post('/signup', celebrate({
@@ -74,5 +66,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
-
-// моя авторизация: e53308b2-3f61-4379-8ee7-a33c421f8fa6

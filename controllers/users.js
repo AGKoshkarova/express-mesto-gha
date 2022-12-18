@@ -1,18 +1,15 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// const validator = require('validator');
 const User = require('../models/user');
 const {
   STATUS_200,
   STATUS_201,
   MESSAGE_400,
-  MESSAGE_401,
   MESSAGE_404,
   MESSAGE_409,
 } = require('../utils/constants');
 
 const NotFoundError = require('../errors/not-found-err');
-const AuthorizationError = require('../errors/auth-err');
 const BadRequestError = require('../errors/baq-req-err');
 const EmailError = require('../errors/email-err');
 
@@ -23,8 +20,6 @@ module.exports.getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.status(STATUS_200).json(users);
   } catch (err) {
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
     return next(err);
   }
 };
@@ -35,17 +30,13 @@ module.exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      // return res.status(ERROR_404).json({ message: MESSAGE_404 });
       return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      // return next(new BadRequestError(MESSAGE_400));
       return res.status(400).json({ message: MESSAGE_400 });
     }
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
     return next(err);
   }
 };
@@ -72,14 +63,11 @@ module.exports.createUser = async (req, res, next) => {
     });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
       return next(new BadRequestError(MESSAGE_400));
     }
     if (err.code === 11000) {
       return next(new EmailError(MESSAGE_409));
     }
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
     return next(err);
   }
 };
@@ -96,19 +84,13 @@ module.exports.updateProfile = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!updatedUser) {
-      // return res.status(ERROR_404).send({
-      //   message: MESSAGE_404,
-      // });
       return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(updatedUser);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
       return next(new BadRequestError(MESSAGE_400));
     }
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
     return next(err);
   }
 };
@@ -124,19 +106,13 @@ module.exports.updateAvatar = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!updatedUserAvatar) {
-      // return res.status(ERROR_404).send({
-      //   message: MESSAGE_404,
-      // });
       return next(new NotFoundError(MESSAGE_404));
     }
     return res.status(STATUS_200).json(updatedUserAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      // return res.status(ERROR_400).json({ message: MESSAGE_400 });
       return next(new BadRequestError(MESSAGE_400));
     }
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
     return next(err);
   }
 };
@@ -157,9 +133,6 @@ module.exports.login = async (req, res, next) => {
     return res.send({ data: user.toJSON() });
   } catch (err) {
     return next(err);
-    // return res.status(ERROR_401).json({ message: MESSAGE_401 });
-    // console.log(err);
-    // return res.status(ERROR_500).json({ message: MESSAGE_500 });
   }
 };
 
