@@ -13,7 +13,7 @@ module.exports.checkAuth = (req, res, next) => {
     payload = jwt.verify(token, secretKey);
   } catch (err) {
     console.log(err);
-    return res.status(ERROR_401).send({ message: ERROR_401 });
+    return res.status(ERROR_401).send({ message: MESSAGE_401 });
   }
 
   req.user = payload;

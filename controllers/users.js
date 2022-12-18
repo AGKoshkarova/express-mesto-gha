@@ -42,7 +42,8 @@ module.exports.getUser = async (req, res, next) => {
     return res.status(STATUS_200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError(MESSAGE_400));
+      // return next(new BadRequestError(MESSAGE_400));
+      return res.status(400).json({ message: MESSAGE_400 });
     }
     // console.log(err);
     // return res.status(ERROR_500).json({ message: MESSAGE_500 });
