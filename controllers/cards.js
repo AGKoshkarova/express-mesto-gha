@@ -5,11 +5,13 @@ const {
   MESSAGE_401,
   MESSAGE_404,
   MESSAGE_400,
+  MESSAGE_403,
 } = require('../utils/constants');
 
 const NotFoundError = require('../errors/not-found-err');
 const AuthorizationError = require('../errors/auth-err');
 const BadRequestError = require('../errors/baq-req-err');
+const AccesError = require('../errors/acces-err');
 
 // запрос на получение всех карточек
 module.exports.getCards = async (req, res, next) => {
@@ -61,7 +63,7 @@ module.exports.deleteCard = async (req, res, next) => {
       // return res.status(ERROR_401).send({
       //  message: MESSAGE_401,
       // });
-      return next(new AuthorizationError(MESSAGE_401));
+      return next(new AccesError(MESSAGE_403));
     }
     return res.status(STATUS_200).send(card);
   } catch (err) {
@@ -87,6 +89,7 @@ module.exports.likeCard = async (req, res, next) => {
       // return res.status(ERROR_404).send({
       //  message: MESSAGE_404,
       // });
+      return next(new NotFoundError(MESSAGE_404));
     }
     card.populate(['likes']);
     return res.status(STATUS_200).json(card);

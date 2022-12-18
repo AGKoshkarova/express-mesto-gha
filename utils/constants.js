@@ -8,6 +8,7 @@ const url = /(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.(ru|com)))
 
 const MESSAGE_400 = 'Переданы некорректные данные';
 const MESSAGE_401 = 'Ошибка авторизации';
+const MESSAGE_403 = 'Доступ к ресурсу запрещен';
 const MESSAGE_404 = 'Пользователь или карточка не найдены';
 const MESSAGE_409 = 'Пользователь с таким email уже зарегистрирован';
 const MESSAGE_500 = 'Произошла ошибка';
@@ -24,6 +25,7 @@ module.exports = {
   STATUS_201,
   MESSAGE_400,
   MESSAGE_401,
+  MESSAGE_403,
   MESSAGE_404,
   MESSAGE_409,
   MESSAGE_500,
