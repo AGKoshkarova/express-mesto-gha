@@ -140,7 +140,6 @@ module.exports.getUserInformation = async (req, res, next) => {
     }
     return res.status(STATUS_200).json(user);
   } catch (err) {
-    console.log(err);
     return next(err);
   }
 };
