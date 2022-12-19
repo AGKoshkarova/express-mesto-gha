@@ -15,7 +15,6 @@ const EmailError = require('../errors/email-err');
 
 // запрос на всех пользователей
 module.exports.getUsers = async (req, res, next) => {
-  console.log(req.cookies.jwt);
   try {
     const users = await User.find({});
     return res.status(STATUS_200).json(users);
@@ -26,7 +25,6 @@ module.exports.getUsers = async (req, res, next) => {
 
 // запрос на поиск пользователя по его id
 module.exports.getUser = async (req, res, next) => {
-  console.log(req.cookies.jwt);
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
@@ -35,7 +33,7 @@ module.exports.getUser = async (req, res, next) => {
     return res.status(STATUS_200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(400).json({ message: MESSAGE_400 });
+      return next(new BadRequestError(MESSAGE_400));
     }
     return next(err);
   }
@@ -74,7 +72,6 @@ module.exports.createUser = async (req, res, next) => {
 
 // запрос на обновление имя и описания пользователя в профиле
 module.exports.updateProfile = async (req, res, next) => {
-  console.log(req.cookies.jwt);
   try {
     const { name, about } = req.body;
 
@@ -97,18 +94,17 @@ module.exports.updateProfile = async (req, res, next) => {
 
 // запрос на изменение аватара пользователя
 module.exports.updateAvatar = async (req, res, next) => {
-  console.log(req.cookies.jwt);
   try {
     const { avatar } = req.body;
-    const updatedUserAvatar = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
       { new: true, runValidators: true },
     );
-    if (!updatedUserAvatar) {
+    if (!updatedUser) {
       return next(new NotFoundError(MESSAGE_404));
     }
-    return res.status(STATUS_200).json(updatedUserAvatar);
+    return res.status(STATUS_200).json(updatedUser);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new BadRequestError(MESSAGE_400));
@@ -119,7 +115,6 @@ module.exports.updateAvatar = async (req, res, next) => {
 
 // запрос на логин (контроллер аутентификации)
 module.exports.login = async (req, res, next) => {
-  console.log(req.cookies.jwt);
   try {
     const { email, password } = req.body;
     const user = await User.findUserByCredentials(email, password);
@@ -130,7 +125,7 @@ module.exports.login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.send({ data: user.toJSON() });
+    return res.send({ data: user });
   } catch (err) {
     return next(err);
   }

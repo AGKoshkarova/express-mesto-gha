@@ -6,9 +6,10 @@ const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { ERROR_404, MESSAGE_404, url } = require('./utils/constants');
+const { MESSAGE_404, url } = require('./utils/constants');
 const { createUser, login } = require('./controllers/users');
 const { checkAuth } = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 
@@ -28,14 +29,14 @@ app.post('/signup', celebrate({
     about: Joi.string().default('Исследователь').min(2).max(30),
     avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').regex(url),
     email: Joi.string().email().required(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 }), createUser);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 }), login);
 
@@ -46,9 +47,7 @@ app.use(userRouter);
 app.use(cardRouter);
 
 app.use('*', (req, res, next) => {
-  res.status(ERROR_404).send({ message: MESSAGE_404 });
-
-  next();
+  next(new NotFoundError(MESSAGE_404));
 });
 
 app.use(errors());

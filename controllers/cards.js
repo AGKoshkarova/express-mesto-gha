@@ -43,9 +43,8 @@ module.exports.createCard = async (req, res, next) => {
 
 // запрос на удаление карточки
 module.exports.deleteCard = async (req, res, next) => {
-  console.log(req.user._id);
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
+    const card = await Card.findById(req.params.cardId);
     if (!card) {
       return next(new NotFoundError(MESSAGE_404));
     }
@@ -53,6 +52,7 @@ module.exports.deleteCard = async (req, res, next) => {
     if (owner !== req.user._id) {
       return next(new AccesError(MESSAGE_403));
     }
+    card.remove();
     return res.status(STATUS_200).send(card);
   } catch (err) {
     if (err.name === 'CastError') {

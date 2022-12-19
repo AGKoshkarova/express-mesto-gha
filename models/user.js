@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
+const { default: isURL } = require('validator/lib/isURL');
 const AuthorizationError = require('../errors/auth-err');
 
 const userSchema = new mongoose.Schema({
@@ -19,6 +20,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator: (v) => isURL(v),
+      message: 'В данном поле должна быть ссылка',
+    },
   },
   email: {
     type: String,
@@ -32,7 +37,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });
@@ -55,5 +59,12 @@ userSchema.statics.findUserByCredentials = function (email, password) {
         });
     });
 };
+
+userSchema.set('toJSON', {
+  transform(doc, res) {
+    delete res.password;
+    return res;
+  },
+});
 
 module.exports = mongoose.model('user', userSchema);
