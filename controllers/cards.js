@@ -52,7 +52,7 @@ module.exports.deleteCard = async (req, res, next) => {
     if (owner !== req.user._id) {
       return next(new AccesError(MESSAGE_403));
     }
-    card.remove();
+    await card.remove();
     return res.status(STATUS_200).send(card);
   } catch (err) {
     if (err.name === 'CastError') {
